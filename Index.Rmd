@@ -1,0 +1,680 @@
+---
+title: "Health Trends & Behaviors in the United States: Insights from Vaccination
+  Rates, Medical Discourse, and Risk-Factors. (2018-2022)"
+output:
+  html_document:
+    code_folding: hide
+    css: styles.css
+    pdf_document: null
+    keep_tex: true
+    always_allow_html: true
+  pdf_document: default
+---
+### **Module Project:**
+**PSY6422 Data Management & Visualization**
+
+## INTRODUCTION 
+Preventative healthcare plays a crucial role in safeguarding public health. Today, it focuses on various strategies, treatments and interventions on at at-risk populations to prevent the onset and progression on a variety of diseases. With developments in medicine and research, the past few decades have witnessed a rise in methods to identify risk factors and secure populations to promote over-all well being. Successfully tackling these healthcare outcomes and risk factors signifies the sustainability of healthcare systems for future generations.
+This project aims to explore specific questions pertaining to the state of healthcare services today – in understanding various facets of such interventions and its prevalence amongst the population. Due to considerations in data-availability, the project focus narrows down on the trends in such healthcare utilizations within the United States of America, from the year 2018 to 2022. The following sections explore specific elements and patterns pertaining to preventative medicine that provides insights into geographical and temporal trends, socio-demographic disparities into utilization and examining patterns of discourse pertaining to such interventions. 
+
+## DATA SOURCE 
+The data for this study was obtained from the health surveys conducted by the Behavioral Risk-Factor Surveillance System (BRFSS). Established by the Centers for Disease Control & Prevention (CDC), the BRFSS collects data on the prevalence of chronic health conditions, health promotion & risk behaviors and utilization rates of preventative medicine services. This is done through regular telephone interviews with the residents of the 50 states & territories of the United States.The BRFSS collects a wide variety of information – **socio-demographics**, **chronic healthcare conditions** (such as heart disease, cancer, diabetes), **health behaviors** (such as alcohol consumption, smoking, diet, physical activity), **preventative health services** (cancer screenings, flu vaccinations, blood pressure checks) and **access to healthcare** (health insurance coverage, utilization of healthcare resources. More information about the data collection methods can be found on
+<a href="https://www.cdc.gov/brfss/index.html" style="color: blue; text-decoration: underline;">CDC BRFSS Website</a>
+
+
+For this project, I analyzed the datasets from 2018 to 2022 (latest down to 5 years), to explore my questions within a relatively recent timeframe. The links for obtaining the dataset are provided in the reference section. 
+
+The <a href="https://github.com/purni24/PSY6422Project/tree/main" style="color: blue; text-decoration: underline;">Repository</a> consists of the raw folders containing the data for the specific questions I have asked. This is discussed more in the Data Preparation Section. 
+The libraries used are presented in the code chunk.
+```{r, warning=FALSE, message=FALSE}
+library (tidyverse)
+library (knitr)
+library (openxlsx)
+library(here)
+library(dplyr)
+library(tidyr)
+library(maps)
+library(plotly)
+library(ggplot2)
+library(viridis)
+library(gganimate)
+library(reshape2)
+library(forcats)
+library(gifski)
+library(animation)
+library(webshot)
+```
+Alternatively, I have added a renv.lock file - a package management tool that stores all information about the used libraries. 
+
+## RESEARCH QUESTIONS 
+The overarching aim of this project is to utilize the BRFSS datasets to identify socio-demographic and geographic trends in early detection and screening services utilized by individuals within different parts of the USA.
+
+1.	**Adult Flu Shot Rate:** What is the percentage of people who have taken their adult flu shot in the last 12 months across various states in the USA? (2022)
+2.	**Urban-Rural Disparities in Contraceptive Utilization:** What are the differences in utilization of various contraceptives in urban and rural areas? (2022)
+3.	**Medical Discourse on Prostate Screening:** What is the nature of the debriefing given to inform people about a blood test to screen for Prostate Cancer? (2018-2022) 
+4.	**HIV Risk-Behaviors by Age:** What are the age-related trends in individuals who demonstrated HIV-Risk behaviors? (2018-2022)
+
+## DATA PREPARATION 
+The original BRFSS files on the website are present in two types of file forms - .xpt and .ascii. I downloaded the .XPT file, and converted it into a .csv file format to examine the file's contents. The data for this step as well as the original BRFSS files for 2018 to 2022 are not uploaded on the repository due to file size limitations, but here is a syntax to convert the file format from .XPT to .CSV that I used: 
+```{r}
+try({
+  data <- openxlsx::read.xlsx("your_data.xpt") 
+}, silent = TRUE)#Reading and converting XPT to CSV
+```
+After an examination of the variables on the BRFSS 2018-2022 sheets, I decided what variables I was going to explore through this project. I retained variables of interest through this code. (syntax provided)
+```{r}
+try({
+  BRFSS_selected <- select(BRFSS, X_STATE, X_AGEG5YR...)
+}, silent = TRUE) #Assuming the raw file is called BRFSS, and you wish to create a new table called "BRFSS_Selected" by selecting only columns such as "X_STATE" and "X_AGEG5YR" 
+```
+
+With this, I selected the variables of interest. The list of variables selected are available in the "codebook.txt" file within the repository.
+I obtained 5 datasets from each of the Raw files obtained from the BRFSS website - each dataset representing files from 2018 to 2022. The chunk contains the code as well as the first few rows of a dataset - BRFSS2022.
+```{r}
+library(openxlsx)
+# File paths
+file_2022 <- here("rawdata", "BRFSS2022.xlsx")
+file_2021 <- here("rawdata", "BRFSS2021.xlsx")
+file_2020 <- here("rawdata", "BRFSS2020.xlsx")
+file_2019 <- here("rawdata", "BRFSS2019.xlsx")
+file_2018 <- here("rawdata", "BRFSS2018.xlsx")
+# Read Excel files
+BRFSS2022 <- read.xlsx(file_2022)
+BRFSS2021 <- read.xlsx(file_2021)
+BRFSS2020 <- read.xlsx(file_2020)
+BRFSS2019 <- read.xlsx(file_2019)
+BRFSS2018 <- read.xlsx(file_2018)
+# Display the first few rows of BRFSS2022 data
+head(BRFSS2022)
+```
+Within the table, is a column called X_STATE, representing numeric values as a key associated with every state. The key is available in the codebook on the repostitory as well as the BRFSS website. For ease, I altered the values of the column to their corresponding states through the following means. 
+
+```{r message=FALSE}
+dataset_names <-  c("BRFSS2022", "BRFSS2021", "BRFSS2020", "BRFSS2019", "BRFSS2018") #determining the datasets to which the state name must be changed, using a function
+state_mapping <- c(
+"1" = "Alabama", "2" = "Alaska", "4" = "Arizona", "5" = "Arkansas", "6" = "California",
+"8" = "Colorado", "9" = "Connecticut", "10" = "Delaware", "11" = "District of Columbia", "12" = "Florida",
+"13" = "Georgia", "15" = "Hawaii", "16" = "Idaho", "17" = "Illinois", "18" = "Indiana", "19" = "Iowa",
+"20" = "Kansas", "21" = "Kentucky", "22" = "Louisiana", "23" = "Maine", "24" = "Maryland", "25" = "Massachusetts",
+"26" = "Michigan", "27" = "Minnesota", "28" = "Mississippi", "29" = "Missouri", "30" = "Montana", "31" = "Nebraska",
+"32" = "Nevada", "33" = "New Hampshire", "34" = "New Jersey", "35" = "New Mexico", "36" = "New York", "37" = "North Carolina",
+"38" = "North Dakota", "39" = "Ohio", "40" = "Oklahoma", "41" = "Oregon", "42" = "Pennsylvania", "44" = "Rhode Island",
+"45" = "South Carolina", "46" = "South Dakota", "47" = "Tennessee", "48" = "Texas", "49" = "Utah", "50" = "Vermont",
+"51" = "Virginia", "53" = "Washington", "54" = "West Virginia", "55" = "Wisconsin", "56" = "Wyoming",
+"66" = "Guam", "72" = "Puerto Rico", "78" = "Virgin Islands"
+) #keying values and corresponding state identification
+update_values <- function(dataset) {
+dataset <- dataset %>%
+mutate(X_STATE = ifelse(X_STATE %in% names(state_mapping), state_mapping[as.character(X_STATE)], X_STATE))
+return(dataset)
+}
+for (name in dataset_names) {
+if (exists(name)) {
+dataset <- get(name)
+modified_dataset <- update_values(dataset)
+assign(name, modified_dataset, envir = .GlobalEnv)
+message(paste("Dataset", name, "updated successfully."))
+} else {
+message(paste("Dataset", name, "not found. Skipping..."))
+}
+} #outlining if-else protocol to change existing state numbers and skip for the datasets with missing states 
+```
+
+
+## VISUALIZATION 1:
+**Adult Flu Shot Rate**: What is the percentage of people who have taken their adult flu shot in the last 12 months across various states in the USA? (2022)
+
+This visualization examines the rates of individuals across various states in the USA who reported of having received the flu-shot vaccine within the last 12 months. 
+
+#### Cleaning Data 
+
+```{r message=FALSE, results='hide'}
+replace_state_codes <- function(code) {
+  case_when(
+    code %in% names(state_mapping) ~ state_mapping[code],
+    TRUE ~ as.character(code)
+  ) #to account for false values 
+}
+flushot_table <- select(BRFSS2022, X_STATE, FLUSHOT7)
+View(flushot_table)
+flushot_table$FLUSHOT7[flushot_table$FLUSHOT7 == "1"] <- "Yes"
+flushot_table$FLUSHOT7[flushot_table$FLUSHOT7 == "2"] <- "No"
+flushot_table$FLUSHOT7[flushot_table$FLUSHOT7 == "1"] <- "Yes"
+flushot_table$FLUSHOT7[flushot_table$FLUSHOT7 == "7"] <- "Unsure"
+flushot_table$FLUSHOT7[flushot_table$FLUSHOT7 == "9"] <- "Refused"
+View(flushot_table) #converting values within the flushot7 variable to the key provided
+
+flushot_table <- flushot_table %>%
+  mutate(X_STATE = replace_state_codes(X_STATE))
+
+flushot_frequency <- flushot_table %>%
+  group_by(X_STATE, FLUSHOT7) %>%
+  summarise(frequency = n()) %>%
+  pivot_wider(names_from = FLUSHOT7, values_from = frequency, values_fill = list(frequency = 0)) #to group the responses and summarize for every state
+
+View(flushot_frequency)
+
+rows_to_sum <- c("No", "Refused", "Unsure", "Yes", "NA")
+flushot_frequency$region <- flushot_frequency$X_STATE
+flushot_frequency$X_STATE <- NULL #to convert the dataset into a format which can be easily integrated with the map dataset
+
+flushot_frequency <- flushot_frequency %>%
+  mutate(total = rowSums(select(., c("No", "Refused", "Unsure", "Yes", "NA")), na.rm = TRUE),
+         flu_shot_rate_by_100 = (Yes / total) * 100) #to calculate the rate
+
+View(flushot_frequency)
+```
+
+#### Visualizating Data 
+```{r fig.keep="none", message=FALSE, warning=FALSE}
+library(maps)
+library(ggplot2)
+library(viridis)
+
+region <- map_data("state")
+flushot_frequency$region <- tolower(flushot_frequency$region)
+merged_data <- merge(region, flushot_frequency, by = "region") #importing the dataset that contains information about the region, associated longitudinal and latitudinal data 
+
+p <- ggplot(merged_data, aes(x = long, y = lat, group = group, fill = flu_shot_rate_by_100,
+                             text = paste("Region: ", region, "<br>",
+                                          "Flu Shot Rate: ", round(flu_shot_rate_by_100, 2), " per 100 people"))) +
+  geom_polygon(color = "black") +
+  scale_fill_viridis(name = "Flu Shot Rate (per 100)", option = "viridis") +
+  labs(title = "Adult Flu Shot Rate - 2022", fill = "Flu Shot Rate",
+       x = "Longitude", y = "Latitude") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8),
+        legend.position = "bottom") #adding colour, legend customizations for the map integrated with the flushot7 variable rates
+
+p <- plotly::ggplotly(p, tooltip = "text") %>% 
+  plotly::layout(width = 1000, height = 600)
+p
+```
+
+<br>    
+
+This choropleth map highlights the geographic trends in adult-flu shot rate across various states of the USA, in the year 2022. While it may be seen that regions in the far-east, such as Maine & New Hampshire report the highest rates of flu-shots taken and Mississippi the lowest, the overall range lies on an average between 35 to 58% of people amongst the entire population. 
+In the preparation of the chart, I wanted to improve the user’s ease in identifying the state and the flu-shot rate. To gain the most out of this map, please hover over the various states on the map of USA to gain more insights into the flushot rates per 100 per region. 
+
+## VISUALIZATION 2:
+**Urban-Rural Disparities in Contraceptive Utilization:** What are the differences in utilization of various contraceptives in urban and rural areas? (2022)
+
+This visualization explores differences in contraceptive use amongst women residing in urban and rural areas across the USA. 
+
+#### Cleaning Data 
+```{r message=FALSE, results='hide'}
+filtered_data <- BRFSS2022 %>%
+drop_na(TYPCNTR9, X_URBSTAT) %>%
+filter(TYPCNTR9 != 77 & TYPCNTR9 != 99) #obtaining necessary variables
+typcntr9_labels <- c(
+"1" = "Female sterilization",
+"2" = "Male sterilization",
+"3" = "Contraceptive implant",
+"4" = "IUD",
+"5" = "Shots",
+"6" = "Birth control pills, Contraceptive Rings & Patches)",
+"7" = "Condoms",
+"8" = "Diaphragm, cervical cap, sponge, foam, jelly, film, or cream",
+"9" = "Had sex at a time when less likely to get pregnant",
+"10" = "Withdrawal",
+"11" = "Emergency contraception / morning after pill",
+"12" = "Other"
+) #converting numerical values with associated code - contraceptive use
+urbstat_labels <- c(
+"1" = "Urban",
+"2" = "Rural"
+) #converting numerical values with associated code - urban or rural area of living
+filtered_data$TYPCNTR9 <- factor(filtered_data$TYPCNTR9, labels = typcntr9_labels)
+filtered_data$X_URBSTAT <- factor(filtered_data$X_URBSTAT, labels = urbstat_labels)
+bircon2022 <- filtered_data %>%
+count(X_URBSTAT, TYPCNTR9) %>%
+spread(key = TYPCNTR9, value = n, fill = 0)
+print("bircon2022:")
+print(bircon2022) #bircon2022 consists of the grouped data of rural and urban status with contraceptive preferences
+```
+
+#### Visualizating Data 
+```{r fig.keep="none", message=FALSE, warning=FALSE}
+bircon2022_long <- bircon2022 %>%
+  pivot_longer(cols = -X_URBSTAT, names_to = "Contraceptive_Method", values_to = "Frequency")
+
+p <- ggplot(bircon2022_long, aes(x = Frequency, y = fct_reorder(Contraceptive_Method, Frequency), color = X_URBSTAT)) +
+  geom_point(size = 6, alpha = 0.8, shape = 16, show.legend = TRUE) +
+  scale_color_manual(values = c("Urban" = "#1f78b4", "Rural" = "#33a02c"),
+                     labels = c("Urban", "Rural"),
+                     name = "Location") +
+  labs(title = "Contraceptive Practices: Urban vs Rural (2022)",
+       x = "Frequency",
+       y = NULL) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
+        axis.text = element_text(size = 12, color = "black"),
+        axis.title = element_text(size = 14, color = "black"),
+        legend.position = "bottom",
+        legend.title = element_text(size = 12),
+        panel.grid.major = element_line(color = "#e0e0e0"),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.ticks = element_blank(),
+        plot.background = element_rect(fill = "white")) #creating a chart to plot the data
+
+animated_plot <- p +
+  transition_states(fct_reorder(Contraceptive_Method, Frequency),
+                    transition_length = 4,
+                    state_length = 2) +
+  shadow_trail(size = 0.5, alpha = 0.1, color = "gray") +
+  enter_fade() +
+  enter_grow() +
+  exit_fade() +
+  exit_shrink() #including animations, frames/second and customizations to points on chart
+```
+![](https://github.com/purni24/PSY6422Project/blob/main/Visualizations/contraceptives.gif?raw=true)
+
+<br>
+As observed in this dataset, individuals within the rural areas tend of utilize contraceptive methods to a minimum, consistent across all types. Interestingly, the frequencies of the urban and rural population widen as the methods move from the bottom to the top of the Y-Axis. The widening discrepancy of the preferred utilization methods raises questions about geographic trends in the knowledge or availability of such methods, which warrants further analysis.
+
+## VISUALIZATION 3:
+**Medical Discourse on Prostate Screening:** What is the nature of the debriefing given to inform people about a blood test to screen for Prostate Cancer? (2018-2022) 
+
+This dataset analyses the frequencies and ratios of individuals who were informed about the merits and demerits of undertaking a blood test to detect Prostate Cancer - measured across "Advantages", "Disadvantages", "Both" and "Neither". 
+
+#### Cleaning Data 
+```{r message=FALSE, results='hide'}
+PSAdf2022 <- select(BRFSS2022, PSATEST1, PCSTALK1)
+PSAdf2021 <- select(BRFSS2021, PSATEST1, PCSTALK)
+PSAdf2020 <- select(BRFSS2020, PSATEST1, PCPSAAD3, PCPSADI1)
+PSAdf2018 <- select(BRFSS2018, PSATEST1, PCPSAAD3, PCPSADI1) #selecting necessary variables of test information provision 
+filtered_PSAdf2022 <- PSAdf2022[!(is.na(PSAdf2022$PSATEST1) & is.na(PSAdf2022$PCSTALK)), ] 
+filtered_PSAdf2021 <- PSAdf2021[!(is.na(PSAdf2021$PSATEST1) & is.na(PSAdf2021$PCSTALK)), ]
+filtered_PSAdf2020 <- subset(PSAdf2020, !(is.na(PSATEST1) & is.na(PCPSAAD3) & is.na(PCPSADI1)))
+filtered_PSAdf2018 <- subset(PSAdf2018, !(is.na(PSATEST1) & is.na(PCPSAAD3) & is.na(PCPSADI1)))
+convert_PSATEST1 <- function(data) {
+data <- mutate(data, PSATEST1 = case_when(
+PSATEST1 == 1 ~ "Yes",
+PSATEST1 == 2 ~ "No",
+PSATEST1 == 7 ~ "Unsure",
+PSATEST1 == 9 ~ "Refused",
+TRUE ~ as.character(PSATEST1)  #identifying and changing numerical values to corresponding responses in 2022 data
+))
+return(data)
+}
+df2022clean <- convert_PSATEST1(filtered_PSAdf2022)
+df2021clean <- convert_PSATEST1(filtered_PSAdf2021 )
+df2020clean <- convert_PSATEST1(filtered_PSAdf2020 )
+df2018clean <- convert_PSATEST1(filtered_PSAdf2018 ) #applying the changed values to all datasets 
+View(df2018clean)
+View(df2020clean)
+View(df2021clean)
+View(df2022clean)
+convert_PCSTALK1 <- function(data) {
+data <- mutate(data, PCSTALK1 = case_when(
+PCSTALK1 == 1 ~ "Advantages",
+PCSTALK1 == 2 ~ "Disadvantages",
+PCSTALK1 == 3 ~ "Both",
+PCSTALK1 == 4 ~ "Neither",
+PCSTALK1 == 7 ~ "Unsure",
+PCSTALK1 == 9 ~ "Refused",#converting responses for uniquely named variables differing between datasets 
+))
+return(data)
+}
+df2022clean <- convert_PCSTALK1(df2022clean)
+convert_PCSTALK <- function(data) {
+data <- mutate(data, PCSTALK = case_when(
+PCSTALK == 1 ~ "Advantages",
+PCSTALK == 2 ~ "Disadvantages",
+PCSTALK == 3 ~ "Both",
+PCSTALK == 4 ~ "Neither",
+PCSTALK == 7 ~ "Unsure",
+PCSTALK == 9 ~ "Refused",
+TRUE ~ as.character(PCSTALK)  
+))
+return(data)
+}
+df2021clean <- convert_PCSTALK(df2021clean)
+convert_values <- function(data) {
+data <- mutate(data,
+PCPSAAD3 = case_when(
+PCPSAAD3 == 1 ~ "Yes",
+PCPSAAD3 == 2 ~ "No",
+PCPSAAD3 == 7 ~ "Unsure",
+PCPSAAD3 == 9 ~ "Refused",
+TRUE ~ as.character(PCPSAAD3)  
+),
+PCPSADI1 = case_when(
+PCPSADI1 == 1 ~ "Yes",
+PCPSADI1 == 2 ~ "No",
+PCPSADI1 == 7 ~ "Unsure",
+PCPSADI1 == 9 ~ "Refused",
+TRUE ~ as.character(PCPSADI1)  
+))
+return(data)
+}
+df2020clean <- convert_values(df2020clean)
+df2018clean <- convert_values(df2018clean)
+calculate_frequency <- function(df) {
+table(df$PSATEST1)
+}
+freq_2022 <- calculate_frequency(df2022clean)
+freq_2021 <- calculate_frequency(df2021clean)
+freq_2020 <- calculate_frequency(df2020clean)
+freq_2018 <- calculate_frequency(df2018clean)
+frequency_table <- data.frame(
+Test_Taken = c("Yes", "No", "Unsure", "Refused"),
+`2022` = as.vector(freq_2022),
+`2021` = as.vector(freq_2021),
+`2020` = as.vector(freq_2020),
+`2018` = as.vector(freq_2018)
+)
+print(frequency_table)
+advantage_freq <- sum(df2022clean$PCSTALK1 == "Advantages", na.rm = TRUE)
+disadvantage_freq <- sum(df2022clean$PCSTALK1 == "Disadvantages", na.rm = TRUE)
+both_freq <- sum(df2022clean$PCSTALK1 == "Both", na.rm = TRUE)
+neither_freq <- sum(df2022clean$PCSTALK1 == "Neither", na.rm = TRUE)
+advantage_table_2022 <- data.frame(
+Year = "2022",
+Advantage = advantage_freq,
+Disadvantage = disadvantage_freq,
+Both = both_freq,
+Neither = neither_freq
+) #grouping variables to a common format of organizing those who were told both advantages and disadvantages, either, or neither, to ensure uniformity
+print(advantage_table_2022)
+advantage_freq_2021 <- sum(df2021clean$PCSTALK == "Advantages", na.rm = TRUE)
+disadvantage_freq_2021 <- sum(df2021clean$PCSTALK == "Disadvantages", na.rm = TRUE)
+both_freq_2021 <- sum(df2021clean$PCSTALK == "Both", na.rm = TRUE)
+neither_freq_2021 <- sum(df2021clean$PCSTALK == "Neither", na.rm = TRUE)
+advantage_table_2021 <- data.frame(
+Year = "2021",
+Advantage = advantage_freq_2021,
+Disadvantage = disadvantage_freq_2021,
+Both = both_freq_2021,
+Neither = neither_freq_2021
+)
+print(advantage_table_2021)
+advantage_freq_2020 <- sum(df2020clean$PCPSAAD3 == "Yes", na.rm = TRUE)
+disadvantage_freq_2020 <- sum(df2020clean$PCPSADI1 == "Yes", na.rm = TRUE)
+both_freq_2020 <- sum(df2020clean$PCPSAAD3 == "Yes" & df2020clean$PCPSADI1 == "Yes", na.rm = TRUE)
+neither_freq_2020 <- sum(df2020clean$PCPSAAD3 == "No" & df2020clean$PCPSADI1 == "No", na.rm = TRUE)
+advantage_table_2020 <- data.frame(
+Year = "2020",
+Advantage = advantage_freq_2020,
+Disadvantage = disadvantage_freq_2020,
+Both = both_freq_2020,
+Neither = neither_freq_2020
+)
+print(advantage_table_2020)
+advantage_freq_2018 <- sum(df2018clean$PCPSAAD3 == "Yes", na.rm = TRUE)
+disadvantage_freq_2018 <- sum(df2018clean$PCPSADI1 == "Yes", na.rm = TRUE)
+both_freq_2018 <- sum(df2018clean$PCPSAAD3 == "Yes" & df2018clean$PCPSADI1 == "Yes", na.rm = TRUE)
+neither_freq_2018 <- sum(df2018clean$PCPSAAD3 == "No" & df2018clean$PCPSADI1 == "No", na.rm = TRUE)
+advantage_table_2018 <- data.frame(
+Year = "2018",
+Advantage = advantage_freq_2018,
+Disadvantage = disadvantage_freq_2018,
+Both = both_freq_2018,
+Neither = neither_freq_2018
+)
+print(advantage_table_2018)
+combined_table <- rbind(advantage_table_2018, advantage_table_2020, advantage_table_2021, advantage_table_2022)
+print(combined_table)
+colors <- c('Advantage' = '#f1a104',
+'Disadvantage' = '#00743f',
+'Both' = '#25b396',
+'Neither' = '#192e5b') #determining colours for visualization
+
+```
+
+#### Visualizating Data 
+```{r fig.keep="none", message=FALSE, warning=FALSE}
+interactive_plot <- plot_ly(data = combined_table, x = ~Year) %>%
+add_trace(y = ~Advantage, type = 'scatter', mode = 'lines', name = 'Advantage', line = list(color = colors['Advantage'], width = 3)) %>%
+add_trace(y = ~Disadvantage, type = 'scatter', mode = 'lines', name = 'Disadvantage', line = list(color = colors['Disadvantage'], width = 3)) %>%
+add_trace(y = ~Both, type = 'scatter', mode = 'lines', name = 'Both', line = list(color = colors['Both'], width = 3)) %>%
+add_trace(y = ~Neither, type = 'scatter', mode = 'lines', name = 'Neither', line = list(color = colors['Neither'], width = 3)) %>%
+layout(title = "Medical Discourse on PSA Tests: An Interactive Visualization",
+xaxis = list(title = "Year", tickangle = -45, tickfont = list(size = 12)),
+yaxis = list(title = "Count", autorange = TRUE, tickfont = list(size = 12)),
+legend = list(title = "Information Told", font = list(size = 12), x = 0.8, y = 1),
+hovermode = "closest",
+plot_bgcolor = "rgba(0,0,0,0)",
+paper_bgcolor = "rgba(0,0,0,0)",
+font = list(color = "black"),
+showlegend = TRUE)
+print(interactive_plot) #determining aesthetics of the plot, opting for hover points, ability to zoom in and actively interact with the plot
+interactive_plot
+```
+
+
+This interactive plot displays information on the number of people who were told about the advantages, disadvantages, both, and neither, on PSA tests. This chart allows individuals to click on the legend elements to select and deselect the items they wish to inspect, as well as hover over tips to display the exact number of individuals. The data was not available for the year 2019.
+
+As you can see, there is a significant drop in all lines from 2020 to 2021. This could be misinterpreted as a drop in discussions about PSA. But, the actual drop is attributed to the reduced number of people who were asked this question in the 2021 and 2022 surveys, as is reported in the BRFSS codebook. 
+I encountered a few challenges while making this visualization, which led me to make certain stylistic choices to improve clarity.
+
+Problem#1 : The overlapping lines on the 2021 datapoint.
+Solution: AS lines as overlapping for 2021 and 2022, I decided to include hover over tips where viewers could observe the number and nature of responses for each line. Each of the legends can also be selected, deselected, and zoomed into, to gain more clarity.
+
+Problem#2: Keeping in mind issues about data integrity and disparities in individuals questioned about this topic, combining datasets in this case may lead to inappropriate representation of temporal trends. 
+
+Solution: Hence, I added another visualization that looked at the ratios of advantages, disadvantages, both, and neither discussed. This ensured the numbers for each of the types of discussions were relative to each year, thereby  reducing speculation about the variations in numbers. 
+```{r message=FALSE, results='hide'}
+combined_table <- combined_table %>%
+mutate(
+ratio_adv_dis = Advantage / Disadvantage,
+ratio_adv_both = Advantage / Both,
+ratio_adv_nei = Advantage / Neither,
+ratio_dis_both = Disadvantage / Both,
+ratio_dis_nei = Disadvantage / Neither,
+ratio_both_nei = Both / Neither
+) #additional information on the ratios of people told about advantages, disadvantages, both and neither for every year 
+combined_table_ratio <- combined_table %>%
+select(ratio_adv_dis, ratio_adv_both, ratio_adv_nei, ratio_dis_both, ratio_both_nei, ratio_dis_nei)
+View(combined_table_ratio)
+combined_table_ratio <- combined_table_ratio %>%
+mutate(Year = c("2018", "2020", "2021", "2022"))
+data_long <- tidyr::pivot_longer(combined_table_ratio, cols = -Year, names_to = "Ratio_Type", values_to = "Ratio_Value")
+names(combined_table_ratio) <- c("Adv/Dis", "Adv/Both", "Adv/Nei", "Dis/Both", "Both/Nei", "Dis/Nei", "Year") #plotting as a table preparing for visualization
+
+```
+ 
+
+#### Visualizing Ratios
+```{r fig.keep="none", message=FALSE, warning=FALSE}
+plot2 <- plot_ly(data = combined_table_ratio, x = ~Year) %>%
+add_trace(y = ~`Adv/Dis`, name = 'Advantage/Disadvantage', type = 'scatter', mode = 'lines+markers', line = list(color = '#92c5de'), marker = list(color = '#92c5de', size = 10)) %>%
+add_trace(y = ~`Adv/Both`, name = 'Advantage/Both', type = 'scatter', mode = 'lines+markers', line = list(color = '#fdb863'), marker = list(color = '#fdb863', size = 10)) %>%
+add_trace(y = ~`Adv/Nei`, name = 'Advantage/Neither', type = 'scatter', mode = 'lines+markers', line = list(color = '#b2abd2'), marker = list(color = '#b2abd2', size = 10)) %>%
+add_trace(y = ~`Dis/Both`, name = 'Disadvantage/Both', type = 'scatter', mode = 'lines+markers', line = list(color = '#e66101'), marker = list(color = '#e66101', size = 10)) %>%
+add_trace(y = ~`Both/Nei`, name = 'Both/Neither', type = 'scatter', mode = 'lines+markers', line = list(color = '#5e3c99'), marker = list(color = '#5e3c99', size = 10)) %>%
+add_trace(y = ~`Dis/Nei`, name = 'Disadvantage/Neither', type = 'scatter', mode = 'lines+markers', line = list(color = '#a6cee3'), marker = list(color = '#a6cee3', size = 10)) %>%
+layout(title = "Medical Discourse on PSA Test: Ratios (2018-2022)",
+legend = list(title = "Ratio Type", font = list(size = 12)),
+xaxis = list(title = "Year"),
+yaxis = list(title = "Ratio"))
+print(plot2)
+plot2 #plotting the ratios for every year as a visualization, adding custom colours, interactive capabilities such as hover tooltips and zoom-in features, enabling selection and deselection of datapoints.
+```
+
+<br> 
+The value of 0.43 as a ratio between Both and Neither suggest that there are a fewer number of people being informed about both advantages and disadvantages, as opposed to neither. Note the spike between 2020 and 2021, and the fall extending to the year 2022.  
+Pro tip: Deselect the data  for Ratio between advantages and disadvantages (by clicking on the legend), to gain some interesting insights into the values lying close to the X-Axis. 
+
+
+## VISUALIZATION 4:
+**HIV Risk-Behaviors by Age:** What are the age-related trends in individuals who demonstrated HIV-Risk behaviors? (2018-2022)
+
+How many people reported of having participated in activities that were determined as contributing to the increased risk of HIV Behaviour?
+Note: This data is missing for the year 2021.
+
+#### Cleaning Data 
+```{r message=FALSE, results='hide'}
+View(BRFSS2018)
+brfss2018_selected <- select(BRFSS2018, X_AGEG5YR, HIVRISK5)
+brfss2019_selected <- select(BRFSS2019, X_AGEG5YR, HIVRISK5)
+brfss2020_selected <- select(BRFSS2020, X_AGEG5YR, HIVRISK5)
+brfss2022_selected <- select(BRFSS2022, X_AGEG5YR, HIVRISK5)
+View(brfss2018_selected) #selecting relevant variables from the master datasets
+hivrisk5_mapping <- c("1" = "Participated", "2" = "Not participated", "7" = "Unsure", "9" = "Refused") #converting numerical variables to corresponding responses
+unique_values_2018 <- unique(brfss2018_selected$HIVRISK5)
+unique_values_2019 <- unique(brfss2019_selected$HIVRISK5)
+brfss2018_selected$HIVRISK5 <- as.character(brfss2018_selected$HIVRISK5)
+brfss2019_selected$HIVRISK5 <- as.character(brfss2019_selected$HIVRISK5)
+brfss2020_selected$HIVRISK5 <- as.character(brfss2020_selected$HIVRISK5)
+brfss2022_selected$HIVRISK5 <- as.character(brfss2022_selected$HIVRISK5) #converting variables as characters, to avoid mix-ups with terminology and interpretation
+brfss2018_selected <- brfss2018_selected %>%
+mutate(HIVRISK5 = case_when(
+HIVRISK5 == "1" ~ "Participated",
+HIVRISK5 == "2" ~ "Not participated",
+HIVRISK5 == "7" ~ "Don't Know",
+HIVRISK5 == "9" ~ "Refused to Answer",
+TRUE ~ HIVRISK5
+)) #combining dataset values 
+brfss2019_selected <- brfss2019_selected %>%
+mutate(HIVRISK5 = case_when(
+HIVRISK5 == "1" ~ "Participated",
+HIVRISK5 == "2" ~ "Not participated",
+HIVRISK5 == "7" ~ "Don't Know",
+HIVRISK5 == "9" ~ "Refused to Answer",
+TRUE ~ HIVRISK5
+))
+brfss2020_selected <- brfss2020_selected %>%
+mutate(HIVRISK5 = case_when(
+HIVRISK5 == "1" ~ "Participated",
+HIVRISK5 == "2" ~ "Not participated",
+HIVRISK5 == "7" ~ "Don't Know",
+HIVRISK5 == "9" ~ "Refused to Answer",
+TRUE ~ HIVRISK5
+))
+brfss2022_selected <- brfss2022_selected %>%
+mutate(HIVRISK5 = case_when(
+HIVRISK5 == "1" ~ "Participated",
+HIVRISK5 == "2" ~ "Not participated",
+HIVRISK5 == "7" ~ "Don't Know",
+HIVRISK5 == "9" ~ "Refused to Answer",
+TRUE ~ HIVRISK5
+))
+unique_values_2018 <- unique(brfss2018_selected$HIVRISK5)
+unique_values_2019 <- unique(brfss2019_selected$HIVRISK5)
+unique_values_2020 <- unique(brfss2020_selected$HIVRISK5)
+unique_values_2022 <- unique(brfss2022_selected$HIVRISK5)
+print("Unique values in brfss2018_selected$HIVRISK5:")
+print(unique_values_2018)
+print("Unique values in brfss2019_selected$HIVRISK5:")
+print(unique_values_2019)
+print("Unique values in brfss2020_selected$HIVRISK5:")
+print(unique_values_2020)
+print("Unique values in brfss2022_selected$HIVRISK5:")
+print(unique_values_2022)
+View(brfss2018_selected)
+ageyr_mapping <- c(
+"1" = "18 to 24", "2" = "25 to 29", "3" = "30 to 34", "4" = "35 to 39",
+"5" = "40 to 44", "6" = "45 to 49", "7" = "50 to 54", "8" = "55 to 59",
+"9" = "60 to 64", "10" = "65 to 69", "11" = "70 to 74", "12" = "75 to 79",
+"13" = "80 and older", "14" = "Nil"
+) #grouping ages across a range of 5 years 
+brfss2018_selected <- mutate(brfss2018_selected, X_AGEG5YR = case_when(
+X_AGEG5YR %in% names(ageyr_mapping) ~ ageyr_mapping[X_AGEG5YR],
+TRUE ~ "Unknown"
+)) #applying the grouping onto each dataset, and displaying cumulative frequencies 
+brfss2019_selected <- mutate(brfss2019_selected, X_AGEG5YR = case_when(
+X_AGEG5YR %in% names(ageyr_mapping) ~ ageyr_mapping[X_AGEG5YR],
+TRUE ~ "Unknown"
+))
+brfss2020_selected <- mutate(brfss2020_selected, X_AGEG5YR = case_when(
+X_AGEG5YR %in% names(ageyr_mapping) ~ ageyr_mapping[X_AGEG5YR],
+TRUE ~ "Unknown"
+))
+brfss2022_selected <- mutate(brfss2022_selected, X_AGEG5YR = case_when(
+X_AGEG5YR %in% names(ageyr_mapping) ~ ageyr_mapping[X_AGEG5YR],
+TRUE ~ "Unknown"
+))
+hivrisk5_mapping <- c("1" = "Participated", "2" = "Not participated", "7" = "Unsure", "9" = "Refused") #creating function to integrate participant response 
+participated_counts <- table(brfss2018_selected$X_AGEG5YR[brfss2018_selected$HIVRISK5 == "Participated"]) #applying function on each dataset from 2018-2022
+not_participated_counts <- table(brfss2018_selected$X_AGEG5YR[brfss2018_selected$HIVRISK5 == "Not participated"])
+dont_know_counts <- table(brfss2018_selected$X_AGEG5YR[brfss2018_selected$HIVRISK5 == "Don't Know"])
+refused_counts <- table(brfss2018_selected$X_AGEG5YR[brfss2018_selected$HIVRISK5 == "Refused to Answer"])
+print(participated_counts)
+print(not_participated_counts)
+print(dont_know_counts)
+print(refused_counts)
+participated_counts <- table(brfss2018_selected$X_AGEG5YR[brfss2018_selected$HIVRISK5 == "Participated"]) #tabulating by response type for each age-group
+not_participated_counts <- table(brfss2018_selected$X_AGEG5YR[brfss2018_selected$HIVRISK5 == "Not participated"])
+dont_know_counts <- table(brfss2018_selected$X_AGEG5YR[brfss2018_selected$HIVRISK5 == "Don't Know"])
+refused_counts <- table(brfss2018_selected$X_AGEG5YR[brfss2018_selected$HIVRISK5 == "Refused to Answer"])
+frequency_table <- data.frame(
+Age_Group = as.character(unique(brfss2018_selected$X_AGEG5YR)),
+Participated = participated_counts,
+Not_Participated = not_participated_counts,
+Don_t_Know = dont_know_counts,
+Refused_to_Answer = refused_counts
+)
+print(frequency_table)
+print(frequency_table)
+View(frequency_table)
+hivdata <- subset(frequency_table, select = -c(Participated.Var1, Not_Participated.Var1,Don_t_Know.Var1, Refused_to_Answer.Var1))
+row_indices_order <- c(13, 14, 2, 10, 5, 6, 9, 7, 11, 4, 8, 3,  1, 12)
+hivdata_long <- reshape2::melt(hivdata, id.vars = "Age_Group", variable.name = "Response", value.name = "Frequency")
+colnames(hivdata) <- c("Age_Group", "Participated", "Not_Participated", "Dont_Know", "Refused_to_Answer") #preparing data for visualization in the long format
+
+```
+
+#### Visualizating Data 
+```{r ig.keep="none", message=FALSE, warning=FALSE}
+HIVrisk <- plot_ly(hivdata, x = ~Age_Group, y = ~Participated, type = "bar", name = "Participated", marker = list(color = "#F8333C", opacity = 0.8)) %>%
+add_trace(y = ~Not_Participated, name = "Not Participated", marker = list(color = "#3C896D", opacity = 0.8)) %>%
+add_trace(y = ~Dont_Know, name = "Unsure", marker = list(color = "#ef5675", opacity = 0.8)) %>%
+add_trace(y = ~Refused_to_Answer, name = "Refused to Answer", marker = list(color = "#ffa600", opacity = 0.8)) %>%
+layout(title = "HIV Risk-Behaviors: Age-based Differences (2018-2022)",
+xaxis = list(title = "Age Group"),
+yaxis = list(title = "Frequency"),
+barmode = "stack",
+legend = list(title = "Frequency Type"),
+plot_bgcolor = "#f7f7f7",
+paper_bgcolor = "#f7f7f7",
+font = list(color = "#333333")
+) #plotting through a bar chart, specifying aesthetics, legend content and layout
+HIVrisk
+```
+
+<br> 
+
+Ending on an optimistic note, this visualization provided alot of interesting insights - not just about the current trends, but also about the nature of data reporting. 
+In a landscape consisting of data and statistical reporting of ongoing challenges in healthcare, it is certainly refreshing to see data pointing towards tangible efforts being made to reduce undesirable health outcomes. This data shows an overwheming number of individuals across all age groups as not participating towards HIV-Risk Behaviours, aggregated between 2018 to 2022. 
+Such positive trends highlight the room for informed and proactive health behaviours, as well as effectiveness for intervention strategies for the same.   
+
+
+## CONCLUSION 
+#### Summary & Takeaways 
+This project aimed to investigate the nature of preventative healthcare services in the USA, over a period of 2018 to 2022, through data collected from the BRFSS Health Surveys. 
+Due to project considerations, analysis and visualizations focused  on the rate of flu-vaccinations, urban-rural disparities in contraceptive usage, patterns of medical discourse and knowledge disseminated in Prostate Cancer Screening, and HIV Risk Behavior patterns among various age groups. 
+Through actively engaging with the data, I gained invaluable insights into the role of socio-demographic variables on healthcare utilization and disparities pertaining to various geographic regions. 
+Pertaining to data management, I learnt alot about the most effective methods to manage and manipulate data, keeping in mind considerations on data integrity and truthful communication of results. Most importantly, I learnt how to tweak visualizations to convey key findings to individuals, both in an aesthetic as well as practical sense. 
+
+Lastly, I enjoyed working and discovering various charts and tools that may best convey a story I wished to narrate. 
+
+#### Future Directions 
+Carrying forward the idea of preventative healthcare, I would like to explore the following questions through this dataset. 
+(1) With the variety of data available in the dataset across decades, I would explore changes in health outcomes longitudinally - such as diabetes, cardiovascular conditions, and cancers. 
+(2) I would focus on understanding health behaviors and its impact on outcomes, utilizing statistical analysis. 
+(3) With information available for specific regions, I would like to explore the reported data in tandem with programs and interventions introduced to assess its role in reported behaviours.
+
+## REFERENCES 
+
+1. 2018 dataset 
+CDC - 2018 BRFSS Survey Data and Documentation.
+https://www.cdc.gov/brfss/annual_data/annual_2018.html
+
+2.	2019 dataset
+CDC - 2019 BRFSS Survey Data and Documentation.
+https://www.cdc.gov/brfss/annual_data/annual_2019.html
+
+3.	2020 dataset 
+CDC - 2020 BRFSS Survey Data and Documentation.
+https://www.cdc.gov/brfss/annual_data/annual_2020.html
+
+4.	2021 dataset 
+CDC - 2021 BRFSS Survey Data and Documentation.
+https://www.cdc.gov/brfss/annual_data/annual_2021.html
+
+5.	2022 dataset 
+CDC - 2022 BRFSS Survey Data and Documentation.   https://www.cdc.gov/brfss/annual_data/annual_2022.html
