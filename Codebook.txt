@@ -1,0 +1,449 @@
+PSY6422 Project - Codebook
+# BRFSS - Behavioral Risk Factor Surveillance System 
+
+Data collected from: 
+(1) BRFSS 2018
+(2) BRFSS 2019
+(3) BRFSS 2020
+(4) BRFSS 2021
+(5) BRFSS 2022
+
+
+# Total variables in each dataset: [rows x columns] 
+BRFSS 2022 - 445133 x 9
+BRFSS 2021 - 438694 x 8 
+BRFSS 2020 - 401959 x 8
+BRFSS 2019 - 418269 x 9 
+BRFSS 2018 - 437437 x 11
+
+# State codenames 
+1 = Alabama
+2 = Alaska
+4 = Arizona
+5 = Arkansas
+6 = California
+8 = Colorado
+9 = Connecticut
+10 = Delaware
+11 = District of Columbia
+12 = Florida
+13 = Georgia
+15 = Hawaii
+16 = Idaho
+17 = Illinois
+18 = Indiana
+19 = Iowa
+20 = Kansas
+21 = Kentucky
+22 = Louisiana
+23 = Maine
+24 = Maryland
+25 = Massachusetts
+26 = Michigan
+27 = Minnesota
+28 = Mississippi
+29 = Missouri
+30 = Montana
+31 = Nebraska
+32 = Nevada
+33 = New Hampshire
+34 = New Jersey
+35 = New Mexico
+36 = New York
+37 = North Carolina
+38 = North Dakota
+39 = Ohio
+40 = Oklahoma
+41 = Oregon
+42 = Pennsylvania
+44 = Rhode Island
+45 = South Carolina
+46 = South Dakota
+47 = Tennessee
+48 = Texas
+49 = Utah
+50 = Vermont
+51 = Virginia
+53 = Washington
+54 = West Virginia
+55 = Wisconsin
+56 = Wyoming
+66 = Guam
+72 = Puerto Rico
+78 = Virgin Islands
+
+FMONTH 
+1 = January
+2 = February 
+3 = March 
+4 = April
+5 = May 
+6 = June 
+7 = July 
+8 = August 
+9 = September 
+10 = October 
+11 = November 
+12 = December 
+
+
+# 2022 - Variable full forms & Questions 
+(1) X_STATE	
+(2) FMONTH	
+(3) FLUSHOT7 - Adult flu shot/spray past 12 mos [During the past 12 months, have you had either flu vaccine that was sprayed in your nose or flu shot injected into your arm?]
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"  
+
+(4) HIVRISK5 - Do Any High Risk Situations Apply [I am going to read you a list. When I am done, please tell me if any of the situations apply to you. You do not 
+need to tell me which one. You have injected any drug other than those prescribed for you in the past year. You have been  treated for a sexually transmitted disease or STD in the past year.  You have given or received money or drugs in exchange  for sex in the past year.] 
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing" 
+	
+(5) PSATEST1 - Ever Had PSA Test [Have you ever had a P.S.A. test?] 	
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"
+
+(6) PCSTALK1 - Did you talk about the advantages or disadvantages of P.S.A. test [When you met with a doctor, nurse, or other health professional, did they talk about the 				advantages, the disadvantages, or both advantages and disadvantages of the prostate-specific antigen or P.S.A. test?] 
+		1 = "Advantages"
+		2 = "Disadvantages"
+		3 = "Both Advantages and Disadvantages 
+		4 = "Neither"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"
+
+
+(7) X_URBSTAT - Urban/Rural Status 
+		1 = "Urban Counties"
+		2 = "Rural Counties"
+		BLANK = "Not defined/Missing"
+
+(8) X_AGEG5YR - Fourteen-level age category
+		1 = "Age 18 to 24"
+		2 = "Age 25 to 29"
+		3 = "Age 30 to 34"
+		4 = "Age 35 to 39"
+		5 = "Age 40 to 44"
+		6 = "Age 45 to 49"
+		7 = "Age 50 to 54"
+		8 = "Age 55 to 59"
+		9 = "Age 60 to 64"
+		10 = "Age 65 to 69"
+		11 = "Age 70 to 74"
+		12 = "Age 75 to 79"
+		13 = "Age 80 or Older"
+		14 = "Don't know/Refused/Missing"
+
+(9) TYPCNTR9 - What did you do to keep you from getting pregnant? [The last time you had sexual intercourse, what did you or your partner do to keep you from getting pregnant?]
+		1 = "Female sterilization (Tubal ligation, Essure, or Adiana)"
+		2 = "Male sterilization (vasectomy)"
+		3 = "Contraceptive implant"
+		4 = "Intrauterine device or IUD (Mirena, Levonorgestrel, ParaGard"
+		5 = "Shots (Depo-Provera)"
+		6 = "Birth control pills, Contraceptive Ring (NuvaRing), Contraceptive patch (Ortho Evra)"
+		7 = "Condoms (male or female)"
+		8 = "Diaphragm, cervical cap, sponge, foam, jelly, film, or cream"
+		9 = "Had sex at a time when less likely to get pregnant (rhythm or natural family planning)"
+		10 = "Withdrawal or pulling out"
+		11 = "Emergency contraception or the morning after pill (Plan B or ella)"
+		12 = "Other method"	
+		77 = "Don’t know/Not sure"
+		99 = "Refused"
+		BLANK = "Not asked or Missing"
+
+# 2021 - Variable full forms & Questions 
+(1) X_STATE	
+(2) FMONTH	
+(3) FLUSHOT7- Adult flu shot/spray past 12 mos [During the past 12 months, have you had either flu vaccine that was sprayed in your nose or flu shot injected into your arm?]
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"  
+
+(4) HIVTST7 - Ever tested H.I.V. [Including fluid testing from your mouth, but not including tests you may have had for blood donation, have you ever been tested for H.I.V?]
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"  
+
+(5) PSATEST1 - Ever Had PSA Test [Have you ever had a P.S.A. test?] 	
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"
+
+(6) PCSTALK - Did you talk about the advantages or disadvantages of P.S.A. test [When you met with a doctor, nurse, or other health professional, did they talk about the 				advantages, the disadvantages, or both advantages and disadvantages of the prostate-specific antigen or P.S.A. test?] 
+		1 = "Advantages"
+		2 = "Disadvantages"
+		3 = "Both Advantages and Disadvantages 
+		4 = "Neither"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"
+
+(7) X_URBSTAT - Urban/Rural Status 
+		1 = "Urban Counties"
+		2 = "Rural Counties"
+		BLANK = "Not defined/Missing"
+
+(8) X_AGEG5YR - Fourteen-level age category
+		1 = "Age 18 to 24"
+		2 = "Age 25 to 29"
+		3 = "Age 30 to 34"
+		4 = "Age 35 to 39"
+		5 = "Age 40 to 44"
+		6 = "Age 45 to 49"
+		7 = "Age 50 to 54"
+		8 = "Age 55 to 59"
+		9 = "Age 60 to 64"
+		10 = "Age 65 to 69"
+		11 = "Age 70 to 74"
+		12 = "Age 75 to 79"
+		13 = "Age 80 or Older"
+		14 = "Don't know/Refused/Missing"
+
+
+
+# 2020 - Variable full forms & Questions 
+(1) X_STATE	
+(2) FLUSHOT7 - Adult flu shot/spray past 12 mos [During the past 12 months, have you had either flu vaccine that was sprayed in your nose or flu shot injected into your arm?]
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"  
+	
+(3) PCPSAAD3	- Has a health professional EVER talked with you about the disadvantages of the PSA test? [Has a doctor, nurse, or other health professional ever talked with 				you about the disadvantages of the PSA test?] 
+ 		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"
+(4) PCPSADI1	- Has a health professional EVER talked with you about the disadvantages of the PSA test? [Has a doctor, nurse, or other health professional ever talked with 				you about the disadvantages of the PSA test?] 
+ 		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"
+ 
+(5) PSATEST1	Ever Had PSA Test [Have you ever had a P.S.A. test?] 
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"
+
+(6) HIVRISK5 - Do Any High Risk Situations Apply [I am going to read you a list. When I am done, please tell me if any of the situations apply to you. You do not 
+			need to tell me which one. You have injected any drug other than those prescribed for you in the past year. You have been  treated for a sexually 				transmitted disease or STD in the past year.  You have given or received money or drugs in exchange  for sex in the past year.] 
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing" 
+
+(7) X_URBSTAT	- Urban/Rural Status 
+		1 = "Urban Counties"
+		2 = "Rural Counties"
+		BLANK = "Not defined/Missing"
+
+(8) X_AGEG5YR  - Fourteen-level age category
+		1 = "Age 18 to 24"
+		2 = "Age 25 to 29"
+		3 = "Age 30 to 34"
+		4 = "Age 35 to 39"
+		5 = "Age 40 to 44"
+		6 = "Age 45 to 49"
+		7 = "Age 50 to 54"
+		8 = "Age 55 to 59"
+		9 = "Age 60 to 64"
+		10 = "Age 65 to 69"
+		11 = "Age 70 to 74"
+		12 = "Age 75 to 79"
+		13 = "Age 80 or Older"
+		14 = "Don't know/Refused/Missing"
+
+
+# 2019 - Variable full forms & Questions 
+(1) X_STATE	
+(2) FLUSHOT7 - Adult flu shot/spray past 12 mos [During the past 12 months, have you had either flu vaccine that was sprayed in your nose or flu shot injected into your arm?]
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"  
+
+(3) HIVTST7 - Ever tested H.I.V.[Including fluid testing from your mouth, but not including tests you may have had for blood donation, have you ever been tested for H.I.V?] 
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"  
+
+(4) HIVRISK5 - Do Any High Risk Situations Apply [I am going to read you a list. When I am done, please tell me if any of the situations apply to you. You do not 
+need to tell me which one. You have injected any drug other than those prescribed for you in the past year. You have been  treated for a sexually transmitted disease or STD in the past year.  You have given or received money or drugs in exchange  for sex in the past year.] 
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing" 
+
+(5) PSATEST1	
+(6) TYPCNTR8 - What did you do to keep you from getting pregnant? [The last time you had sex with a man, what did you or your partner do to keep you from getting pregnant?]
+		1 = "Female sterilization (Tubal ligation, Essure, or Adiana)"
+		2 = "Male sterilization (vasectomy)"
+		3 = "Contraceptive implant (ex. Nexplanon, Jadelle, Sino Implant, Implanon)"
+		4 = "Intrauterine device or IUD (Mirena, Levonorgestrel, ParaGard)"
+		5 = "IUD, Copper-bearing (ex. ParaGard)"	
+		6 = "IUD, type unknown"
+		7 = "Shots (ex. Depo-Provera or DMPA)"
+		8 = "Birth control pills, any kind"
+		9 = "Contraceptive patch (ex. Ortho Evra, Xulane)"
+		10 = "Contraceptive ring (ex. NuvaRing)"
+		11 = "Male condoms"
+		12 = "Diaphragm, cervical cap, sponge"
+		13 = "Female condoms"
+		14 = "Not having sex at certain times (rhythm or natural family planning)"
+		15 = "Withdrawal (or pulling out)"
+		16 = "Foam, jelly, film, or cream"
+		17 = "Emergency contraception"
+		18 = "Other method"
+		77 = "Don’t know/Not sure"
+		99 = "Not asked or Missing"
+
+(7) X_URBSTAT - Urban/Rural Status
+		1 = "Urban Counties"
+		2 = "Rural Counties"
+		BLANK = "Not defined/Missing"
+
+(8) X_RACE - Race/ethnicity categories 
+		1 = "White only, non-Hispanic"
+		2 = "Black only, non-Hispanic"
+		3 = "American Indian or Alaskan Native only"
+		4 = "Asian only, non-Hispanic""
+		5 = "native Hawaiian or other Pacific Islander only, non-Hispanic"
+		6 = "Other race only, non-Hispanic"
+		7 = "Multiracial, Non-Hispanic"
+		8 = "Hispanic"
+		9 = "Don't know/Not Sure/Refused"
+		BLANK = "Missing"
+
+(9) X_AGEG5YR - Fourteen-level age category
+		1 = "Age 18 to 24"
+		2 = "Age 25 to 29"
+		3 = "Age 30 to 34"
+		4 = "Age 35 to 39"
+		5 = "Age 40 to 44"
+		6 = "Age 45 to 49"
+		7 = "Age 50 to 54"
+		8 = "Age 55 to 59"
+		9 = "Age 60 to 64"
+		10 = "Age 65 to 69"
+		11 = "Age 70 to 74"
+		12 = "Age 75 to 79"
+		13 = "Age 80 or Older"
+		14 = "Don't know/Refused/Missing"
+
+
+# 2018 - Variable full forms & Questions 
+(1) X_STATE 
+(2) SEX1 - Sex [What is your sex? or What was your sex at birth?] 
+		1 = "Male"
+		2 = "Female 
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+
+(3) FLUSHOT6 - Adult flu shot/ spray past 12 mos [During the past 12 months, have you had either a flu shot or a flu vaccine that was sprayed in your nose?  (A 
+new flu shot came out in 2011 that injects vaccine into the skin with a very small needle. It is called Fluzone Intradermal vaccine. This is also considered a flu shot. ] 
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing"
+
+(4) PCPSAAD3 - Has a health professional EVER talked with you about the advantages of the PSA test? [Has a doctor, nurse, or other health professional ever talked with you about the advantages of the Prostate-Specific Antigen or P.S.A. test?] 
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing" 
+		
+(5) PCPSADI1 - Has a health professional EVER talked with you about the disadvantages of the PSA test? [Has a doctor, nurse, or other health professional ever talked with you about the disadvantages of the PSA test?] 
+ 		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing" 
+
+(6) PSATEST1 - Ever had a PSA Test? [Have you ever had a P.S.A. test?]
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing" 
+
+(7) HIVRISK5 - Do Any High Risk Situations Apply [I am going to read you a list. When I am done, please tell me if any of the situations apply to you. You do not 
+need to tell me which one. You have injected any drug other than those prescribed for you in the past year. You have been  treated for a sexually transmitted disease or STD in the past year.  You have given or received money or drugs in exchange  for sex in the past year.] 
+		1 = "Yes"
+		2 = "No"
+		7 = "Don't Know/Not Sure"
+		9 = "Refused"
+		BLANK = "Not Asked/Missing" 
+
+
+(8) HLTHCVR1 - Primary Health Insurance Coverage [What is the primary source of your health care coverage? Is it…]
+		1 = "A plan purchased through an employer or union; Notes: Includes 			Plans purchased through another person's employer"
+		2 = "A plan that you or another family member buys on your own"
+		3 = "Medicare"
+		4 = "Medicaid or other state program"
+		5 = "TRICARE (formerly CHAMPUS), VA, or Military"
+		6 = "Alaska Native, Indian Health Service, Tribal Health Service"
+		7 = Some other Source"
+		8 = "None (No Coverage)"
+		77 = "Refused"
+		99 = "Not Asked/Missing"
+
+(9) X_URBSTAT - Urban/Rural Status 
+		1 = "Urban Counties"
+		2 = "Rural Counties"
+		BLANK = "Not defined/Missing"
+
+(10) X_RACE - Race/ethnicity categories 
+		1 = "White only, non-Hispanic"
+		2 = "Black only, non-Hispanic"
+		3 = "American Indian or Alaskan Native only"
+		4 = "Asian only, non-Hispanic""
+		5 = "native Hawaiian or other Pacific Islander only, non-Hispanic"
+		6 = "Other race only, non-Hispanic"
+		7 = "Multiracial, Non-Hispanic"
+		8 = "Hispanic"
+		9 = "Don't know/Not Sure/Refused"
+		BLANK = "Missing"		
+
+(11) X_AGEG5YR - Fourteen-level age category
+		1 = "Age 18 to 24"
+		2 = "Age 25 to 29"
+		3 = "Age 30 to 34"
+		4 = "Age 35 to 39"
+		5 = "Age 40 to 44"
+		6 = "Age 45 to 49"
+		7 = "Age 50 to 54"
+		8 = "Age 55 to 59"
+		9 = "Age 60 to 64"
+		10 = "Age 65 to 69"
+		11 = "Age 70 to 74"
+		12 = "Age 75 to 79"
+		13 = "Age 80 or Older"
+		14 = "Don't know/Refused/Missing"
+
